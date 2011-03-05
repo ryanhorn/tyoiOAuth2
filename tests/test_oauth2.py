@@ -10,8 +10,9 @@ class TestOAuth2Client(unittest.TestCase):
         self._mox = mox.Mox()
 
     def testNewOAuth2ClientBadGrantType(self):
-        self.assertRaises(UnsupportedGrantTypeError, OAuth2Client, client_id='test',
-                          client_secret='test', access_token_endpoint='test',
+        self.assertRaises(UnsupportedGrantTypeError, OAuth2Client,
+                          client_id='test', client_secret='test',
+                          access_token_endpoint='test',
                           grant_type='bad_grant_type')
 
     def testNewOAuth2ClientValidParams(self):
@@ -25,7 +26,8 @@ class TestOAuth2Client(unittest.TestCase):
 
         self.assertEquals('test_client_id', client._client_id)
         self.assertEquals('test_client_secret', client._client_secret)
-        self.assertEquals('test_access_token_endpoint', client._access_token_endpoint)
+        self.assertEquals('test_access_token_endpoint',
+                          client._access_token_endpoint)
         self.assertEquals('test_auth_endpoint', client._auth_endpoint)
         self.assertEquals('authorization_code', client._grant_type)
         self.assertEquals('test_redirect_uri', client._redirect_uri)

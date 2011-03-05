@@ -1,3 +1,9 @@
+"""
+Implements the application side of OAuth2 for the "authoriztion_code" and
+"client_credentials" grant types
+"""
+
+
 class OAuth2Error(Exception):
     pass
 
