@@ -1,6 +1,3 @@
-import sys
-sys.path.append('../tyoi')
-
 import unittest
 import mox
 
