@@ -56,9 +56,12 @@ class OAuth2Client(object):
         self._redirect_uri = redirect_uri
         self._scope = scope
 
-    def get_auth_uri(self):
+    def get_auth_uri(self, state=None):
         """
         Returns the uri for user authentication/authorization
+
+            state - The state argument will be passed back when the user is
+                    redirected back to the application after authenticating
         """
         if 'client_credentials' == self._grant_type:
             raise OAuth2Error('get_auth_uri can only be used with the\
@@ -68,5 +71,8 @@ class OAuth2Client(object):
 
         if self._scope is not None:
             params['scope'] = ' '.join(self._scope)
+
+        if state is not None:
+            params['state'] = state
 
         return '%s?%s' % (self._auth_endpoint, urlencode(params))

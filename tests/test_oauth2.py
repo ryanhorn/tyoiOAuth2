@@ -69,3 +69,15 @@ class TestOAuth2Client(unittest.TestCase):
             'http://www.example.com/oauth?scope=perm1+perm2+perm3&response_type=code&client_id=test_client_id',
             client.get_auth_uri()
         )
+
+    def testGetAuthUriWithState(self):
+        client = OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='test',
+                              grant_type='authorization_code',
+                              auth_endpoint='http://www.example.com/oauth')
+
+        self.assertEquals(
+            'http://www.example.com/oauth?state=test_state&response_type=code&client_id=test_client_id',
+            client.get_auth_uri('test_state')
+        )
