@@ -66,4 +66,7 @@ class OAuth2Client(object):
 
         params = {'response_type': 'code', 'client_id': self._client_id}
 
+        if self._scope is not None:
+            params['scope'] = ' '.join(self._scope)
+
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
