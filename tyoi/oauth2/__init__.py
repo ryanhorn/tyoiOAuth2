@@ -1,8 +1,12 @@
-class UnsupportedGrantTypeError(Exception):
+class OAuth2Error(Exception):
     pass
 
 
-class Client(object):
+class UnsupportedGrantTypeError(OAuth2Error):
+    pass
+
+
+class OAuth2Client(object):
     def __init__(self, client_id, client_secret, grant_type,
                  access_token_endpoint, auth_endpoint, redirect_uri=None,
                  scope=None):

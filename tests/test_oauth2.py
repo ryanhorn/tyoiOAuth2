@@ -1,21 +1,21 @@
 import unittest
 import mox
 
-from tyoi.oauth2 import Client, UnsupportedGrantTypeError
+from tyoi.oauth2 import OAuth2Client, UnsupportedGrantTypeError
 
 
-class TestClient(unittest.TestCase):
+class TestOAuth2Client(unittest.TestCase):
 
     def setUp(self):
         self._mox = mox.Mox()
 
-    def testNewClientBadGrantType(self):
-        self.assertRaises(UnsupportedGrantTypeError, Client, client_id='test',
+    def testNewOAuth2ClientBadGrantType(self):
+        self.assertRaises(UnsupportedGrantTypeError, OAuth2Client, client_id='test',
                           client_secret='test', access_token_endpoint='test',
                           auth_endpoint='test', grant_type='bad_grant_type')
 
-    def testNewClientValidParams(self):
-        client = Client(client_id='test_client_id',
+    def testNewOAuth2ClientValidParams(self):
+        client = OAuth2Client(client_id='test_client_id',
                         client_secret='test_client_secret',
                         access_token_endpoint='test_access_token_endpoint',
                         auth_endpoint='test_auth_endpoint',
