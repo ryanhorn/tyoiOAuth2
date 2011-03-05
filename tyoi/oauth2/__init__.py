@@ -14,6 +14,19 @@ class UnsupportedGrantTypeError(OAuth2Error):
     pass
 
 
+class AccessToken(object):
+    def __init__(self, access_token, token_type='bearer', expires_in=None,
+                 refresh_token=None, scope=None):
+        self.access_token = access_token
+        self.token_type = token_type
+        self.expires_in = expires_in
+        self.refresh_token = refresh_token
+        self.scope = scope
+
+    def __str__(self):
+        return self.access_token
+
+
 class OAuth2Client(object):
     def __init__(self, client_id, client_secret, grant_type,
                  access_token_endpoint, auth_endpoint=None, redirect_uri=None,

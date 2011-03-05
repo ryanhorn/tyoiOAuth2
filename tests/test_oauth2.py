@@ -1,7 +1,8 @@
 import unittest
 import mox
 
-from tyoi.oauth2 import OAuth2Client, OAuth2Error, UnsupportedGrantTypeError
+from tyoi.oauth2 import (AccessToken, OAuth2Client, OAuth2Error,
+                         UnsupportedGrantTypeError)
 
 
 class TestOAuth2Client(unittest.TestCase):
@@ -69,6 +70,18 @@ class TestOAuth2Client(unittest.TestCase):
             'http://www.example.com/oauth?scope=perm1+perm2+perm3&response_type=code&client_id=test_client_id',
             client.get_auth_uri()
         )
+
+    def testAccessToken(self):
+        token = AccessToken(access_token='test_access_token',
+                            token_type='bearer', expires_in='3600',
+                            refresh_token='test_refresh_token',
+                            scope=['perm1', 'perm2', 'perm3'])
+        self.assertEquals('test_access_token', token.access_token)
+        self.assertEquals('bearer', token.token_type)
+        self.assertEquals('3600', token.expires_in)
+        self.assertEquals('test_refresh_token', token.refresh_token)
+        self.assertEquals(['perm1', 'perm2', 'perm3'], token.scope)
+        self.assertEquals('test_access_token', str(token))
 
     def testGetAuthUriWithState(self):
         client = OAuth2Client(client_id='test_client_id',
