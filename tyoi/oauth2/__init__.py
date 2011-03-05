@@ -23,8 +23,8 @@ class OAuth2Client(object):
 
             client_secret - Required. The client secret
 
-            grant_type - Required. The grant type. Only "authorization_code" and
-                         "client_credentials" are supported
+            grant_type - Required. The grant type. Only "authorization_code"
+                         and "client_credentials" are supported
 
             access_token_endpoint - Required. Base url for requesting an access
                                     token
@@ -53,3 +53,11 @@ class OAuth2Client(object):
         self._auth_endpoint = auth_endpoint
         self._redirect_uri = redirect_uri
         self._scope = scope
+
+    def get_auth_uri(self):
+        """
+        Returns the uri for user authentication/authorization
+        """
+        if 'client_credentials' == self._grant_type:
+            raise OAuth2Error('get_auth_uri can only be used with the\
+                              "authorization_code" grant type')

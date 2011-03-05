@@ -37,3 +37,10 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertRaises(OAuth2Error, OAuth2Client, client_id='test',
                           client_secret='test', access_token_endpoint='test',
                           grant_type='authorization_code')
+
+    def testGetAuthUriClientCredentialsGrant(self):
+        client = OAuth2Client(client_id='test', client_secret='test',
+                              access_token_endpoint='test',
+                              grant_type='client_credentials')
+
+        self.assertRaises(OAuth2Error, client.get_auth_uri)
