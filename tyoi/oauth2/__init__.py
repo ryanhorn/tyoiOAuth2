@@ -5,6 +5,10 @@ Implements the application side of OAuth2 for the "authoriztion_code" and
 
 from urllib import urlencode
 
+from urllib2 import urlopen
+
+from json import loads
+
 
 class OAuth2Error(Exception):
     pass
@@ -89,3 +93,44 @@ class OAuth2Client(object):
             params['state'] = state
 
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
+
+    def request_access_token(self, code=None, custom_parser=None):
+        """
+        Builds the access token request url, sends a POST request using
+        application/x-www-form-urlencoded encoding. If no custom parser is
+        supplied, the response is JSON decoded and used to create an
+        AccessToken object.
+
+            code - The access code returned by an authorization request.
+              Required for the "authorization_code" grant type. Raises
+              tyoi.oauth2.InvalidAccessTokenRequestError if not supplied
+              when using the "authorization_code" grant type
+
+            custom_parser - A custom callable can be supplied to override the
+              default method of extracting AccessToken parameters from the
+              response. This is necessary for oAuth2 implementations which do
+              not adhere to the standard (ex: Facebook). The callable should
+              return a dictionary with keys and values as follows:
+
+                access_token - The access token
+
+                token_type - The token type
+
+                expires_in - The number of seconds in which the token expires
+
+                refresh_token - The refresh token
+
+                scope - The permission scope (as a space delimited string)
+        """
+        f = urlopen('%s?%s' % (self._access_token_endpoint,
+                               urlencode({'client_id': self._client_id,
+                                          'client_secret': self._client_secret,
+                                          'grant_type': self._grant_type})),
+                               {})
+        data = loads(f.read())
+        access_token = data.get('access_token')
+        token_type = data.get('token_type')
+        expires_in = data.get('expires_in')
+        refresh_token = data.get('refresh_token')
+        scope = data.get('scope')
+        return AccessToken(access_token, token_type, expires_in, refresh_token, scope)

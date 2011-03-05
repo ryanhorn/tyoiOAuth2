@@ -1,23 +1,29 @@
 import unittest
+
 import mox
 
-from tyoi.oauth2 import (AccessToken, OAuth2Client, OAuth2Error,
-                         UnsupportedGrantTypeError)
-
+from tyoi import oauth2
 
 class TestOAuth2Client(unittest.TestCase):
 
     def setUp(self):
         self._mox = mox.Mox()
 
+    def _create_urlopen_mock(self):
+        from urllib2 import urlopen
+        return self._mox.CreateMock(urlopen)
+
+    def _create_file_mock(self):
+        return self._mox.CreateMock(file)
+
     def testNewOAuth2ClientBadGrantType(self):
-        self.assertRaises(UnsupportedGrantTypeError, OAuth2Client,
+        self.assertRaises(oauth2.UnsupportedGrantTypeError, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',
                           access_token_endpoint='test',
                           grant_type='bad_grant_type')
 
     def testNewOAuth2ClientValidParams(self):
-        client = OAuth2Client(client_id='test_client_id',
+        client = oauth2.OAuth2Client(client_id='test_client_id',
                         client_secret='test_client_secret',
                         access_token_endpoint='test_access_token_endpoint',
                         auth_endpoint='test_auth_endpoint',
@@ -35,19 +41,19 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals(['test_scope_1', 'test_scope_2'], client._scope)
 
     def testAuthCodeWithoutAuthEndpoint(self):
-        self.assertRaises(OAuth2Error, OAuth2Client, client_id='test',
+        self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client, client_id='test',
                           client_secret='test', access_token_endpoint='test',
                           grant_type='authorization_code')
 
     def testGetAuthUriClientCredentialsGrant(self):
-        client = OAuth2Client(client_id='test', client_secret='test',
+        client = oauth2.OAuth2Client(client_id='test', client_secret='test',
                               access_token_endpoint='test',
                               grant_type='client_credentials')
 
-        self.assertRaises(OAuth2Error, client.get_auth_uri)
+        self.assertRaises(oauth2.OAuth2Error, client.get_auth_uri)
 
     def testGetAuthUri(self):
-        client = OAuth2Client(client_id='test_client_id',
+        client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
                               grant_type='authorization_code',
@@ -59,7 +65,7 @@ class TestOAuth2Client(unittest.TestCase):
         )
 
     def testGetAuthUriWithScope(self):
-        client = OAuth2Client(client_id='test_client_id',
+        client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
                               grant_type='authorization_code',
@@ -72,7 +78,7 @@ class TestOAuth2Client(unittest.TestCase):
         )
 
     def testAccessToken(self):
-        token = AccessToken(access_token='test_access_token',
+        token = oauth2.AccessToken(access_token='test_access_token',
                             token_type='bearer', expires_in='3600',
                             refresh_token='test_refresh_token',
                             scope=['perm1', 'perm2', 'perm3'])
@@ -84,7 +90,7 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_access_token', str(token))
 
     def testGetAuthUriWithState(self):
-        client = OAuth2Client(client_id='test_client_id',
+        client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
                               grant_type='authorization_code',
@@ -94,3 +100,34 @@ class TestOAuth2Client(unittest.TestCase):
             'http://www.example.com/oauth?state=test_state&response_type=code&client_id=test_client_id',
             client.get_auth_uri('test_state')
         )
+
+    def testRequestAccessTokenClientCredentialsNoCodeNoCustomParser(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              grant_type='client_credentials')
+
+        urlopen_mock = self._create_urlopen_mock()
+        resp_mock = self._create_file_mock()
+
+        urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
+                     {}).AndReturn(resp_mock)
+        resp_mock.read().AndReturn('{"access_token": "test_access_token",\
+                                     "token_type": "test_token_type",\
+                                     "expires_in": "3600",\
+                                     "refresh_token": "test_refresh_token"}')
+
+        # Monkey patch
+        tmp = oauth2.urlopen
+        oauth2.urlopen = urlopen_mock
+
+        self._mox.ReplayAll()
+        token = client.request_access_token()
+        self._mox.VerifyAll()
+
+        oauth2.urlopen = tmp
+
+        self.assertEquals('test_access_token', token.access_token)
+        self.assertEquals('test_token_type', token.token_type)
+        self.assertEquals('3600', token.expires_in)
+        self.assertEquals('test_refresh_token', token.refresh_token)
