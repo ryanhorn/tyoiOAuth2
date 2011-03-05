@@ -16,13 +16,13 @@ class TestOAuth2Client(unittest.TestCase):
     def _create_file_mock(self):
         return self._mox.CreateMock(file)
 
-    def testNewOAuth2ClientBadGrantType(self):
+    def test_new_o_auth2_client_bad_grant_type(self):
         self.assertRaises(oauth2.UnsupportedGrantTypeError, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',
                           access_token_endpoint='test',
                           grant_type='bad_grant_type')
 
-    def testNewOAuth2ClientValidParams(self):
+    def test_new_o_auth2_client_valid_params(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                         client_secret='test_client_secret',
                         access_token_endpoint='test_access_token_endpoint',
@@ -40,19 +40,19 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_redirect_uri', client._redirect_uri)
         self.assertEquals(['test_scope_1', 'test_scope_2'], client._scope)
 
-    def testAuthCodeWithoutAuthEndpoint(self):
+    def test_auth_code_without_auth_endpoint(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client, client_id='test',
                           client_secret='test', access_token_endpoint='test',
                           grant_type='authorization_code')
 
-    def testGetAuthUriClientCredentialsGrant(self):
+    def test_get_auth_uri_client_credentials_grant(self):
         client = oauth2.OAuth2Client(client_id='test', client_secret='test',
                               access_token_endpoint='test',
                               grant_type='client_credentials')
 
         self.assertRaises(oauth2.OAuth2Error, client.get_auth_uri)
 
-    def testGetAuthUri(self):
+    def test_get_auth_uri(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
@@ -64,7 +64,7 @@ class TestOAuth2Client(unittest.TestCase):
             client.get_auth_uri()
         )
 
-    def testGetAuthUriWithScope(self):
+    def test_get_auth_uri_with_scope(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
@@ -77,7 +77,7 @@ class TestOAuth2Client(unittest.TestCase):
             client.get_auth_uri()
         )
 
-    def testAccessToken(self):
+    def test_access_token(self):
         token = oauth2.AccessToken(access_token='test_access_token',
                             token_type='bearer', expires_in='3600',
                             refresh_token='test_refresh_token',
@@ -89,7 +89,7 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals(['perm1', 'perm2', 'perm3'], token.scope)
         self.assertEquals('test_access_token', str(token))
 
-    def testGetAuthUriWithState(self):
+    def test_get_auth_uri_with_state(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
@@ -101,7 +101,7 @@ class TestOAuth2Client(unittest.TestCase):
             client.get_auth_uri('test_state')
         )
 
-    def testRequestAccessTokenClientCredentialsNoCodeNoCustomParser(self):
+    def test_request_access_token_client_credentials_no_code_no_custom_parser(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='http://www.example.com/access_token',
