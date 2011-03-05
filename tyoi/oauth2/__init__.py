@@ -3,6 +3,8 @@ Implements the application side of OAuth2 for the "authoriztion_code" and
 "client_credentials" grant types
 """
 
+from urllib import urlencode
+
 
 class OAuth2Error(Exception):
     pass
@@ -61,3 +63,7 @@ class OAuth2Client(object):
         if 'client_credentials' == self._grant_type:
             raise OAuth2Error('get_auth_uri can only be used with the\
                               "authorization_code" grant type')
+
+        params = {'response_type': 'code', 'client_id': self._client_id}
+
+        return '%s?%s' % (self._auth_endpoint, urlencode(params))
