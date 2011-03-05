@@ -16,6 +16,28 @@ class OAuth2Client(object):
     def __init__(self, client_id, client_secret, grant_type,
                  access_token_endpoint, auth_endpoint=None, redirect_uri=None,
                  scope=None):
+        """
+        Sets the provided arguments.
+
+            client_id - Required. The client id
+
+            client_secret - Required. The client secret
+
+            grant_type - Required. The grant type. Only "authorization_code" and
+                         "client_credentials" are supported
+
+            access_token_endpoint - Required. Base url for requesting an access
+                                    token
+
+            auth_endpoint - Required when grant_type is "authorization_code".
+                            Base url for redirecting a user for authentication
+                            and authorization
+
+            redirect_uri - The uri to redirect the user to after
+                           authentication/authorization
+
+            scope - An iterable of requested permissions
+        """
         if grant_type not in ('authorization_code', 'client_credentials'):
             raise UnsupportedGrantTypeError('Unsupported grant type "%s"' %
                                             grant_type)
