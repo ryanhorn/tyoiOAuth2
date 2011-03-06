@@ -206,6 +206,33 @@ class TestOAuth2Client(unittest.TestCase):
 
         oauth2.urlopen = tmp
 
+    def _test_request_access_token_error_response(self):
+        from urllib2 import HTTPError
+
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                                     client_secret='test_client_secret',
+                                     access_token_endpoint='http://www.example.com/access_token',
+                                     grant_type='client_credentials')
+
+        urlopen_mock = self._create_urlopen_mock()
+        resp_mock = self._create_file_mock()
+
+        error_response = '{"error": "invalid_request"}'
+        urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
+                     {}).AndRaise(HTTPError('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
+                                            400, '', {}, resp_mock))
+        resp_mock.read().AndReturn('{"not_access_token": "value"}')
+
+        # Monkey patch
+        tmp = oauth2.urlopen
+        oauth2.urlopen = urlopen_mock
+
+        self._mox.ReplayAll()
+        self.assertRaises(oauth2.AccessTokenResponseError, client.request_access_token)
+        self._mox.VerifyAll()
+
+        oauth2.urlopen = tmp
+
     def test_refresh_access_token_with_default_parser_and_scope(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
@@ -270,3 +297,29 @@ class TestOAuth2Client(unittest.TestCase):
         self._mox.VerifyAll()
 
         oauth2.urlopen = tmp
+
+    def test_access_token_request_all_error_codes(self):
+        error = oauth2.AccessTokenRequestError(error_code='invalid_request')
+        self.assertEquals('invalid_request', error.error_code)
+        self.assertEquals('The request is missing a unsupported parameter or parameter, includes multiple credentials, utilizes more than one mechanism for authenticating the client, or is otherwise malformed.', error.error_code_description)
+
+        error = oauth2.AccessTokenRequestError(error_code='invalid_client')
+        self.assertEquals('invalid_client', error.error_code)
+        self.assertEquals('Client authentication failed (e.g. unknown client, no client credentials included, multiple client credentials included, or unsupported credentials type).', error.error_code_description)
+
+        error = oauth2.AccessTokenRequestError(error_code='invalid_grant')
+        self.assertEquals('invalid_grant', error.error_code)
+        self.assertEquals('The provided authorization grant is invalid, expired, revoked, or does not match the redirection URI used in the authorization request.', error.error_code_description)
+
+        error = oauth2.AccessTokenRequestError(error_code='unauthorized_client')
+        self.assertEquals('unauthorized_client', error.error_code)
+        self.assertEquals('The authenticated client is not authorized to use this authorization grant type.', error.error_code_description)
+
+        error = oauth2.AccessTokenRequestError(error_code='unsupported_grant_type')
+        self.assertEquals('unsupported_grant_type', error.error_code)
+        self.assertEquals('The authorization grant type is not supported by the authorization server.', error.error_code_description)
+
+        error = oauth2.AccessTokenRequestError(error_code='invalid_scope')
+        self.assertEquals('invalid_scope', error.error_code)
+        self.assertEquals('The requested scope is invalid, unknown, malformed, or exceeds the previously granted scope.', error.error_code_description)
+

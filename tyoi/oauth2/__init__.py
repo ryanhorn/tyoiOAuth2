@@ -17,7 +17,56 @@ class OAuth2Error(Exception):
 
 
 class AccessTokenRequestError(OAuth2Error):
-    pass
+    error_code_descriptions = {
+        'invalid_request': 'The request is missing a unsupported parameter ' +
+                           'or parameter, includes multiple credentials, ' +
+                           'utilizes more than one mechanism for ' +
+                           'authenticating the client, or is otherwise ' +
+                           'malformed.',
+
+        'invalid_client': 'Client authentication failed (e.g. unknown ' +
+                          'client, no client credentials included, multiple ' +
+                          'client credentials included, or unsupported ' +
+                          'credentials type).',
+
+        'invalid_grant': 'The provided authorization grant is invalid, ' +
+                         'expired, revoked, or does not match the ' +
+                         'redirection URI used in the authorization request.',
+
+        'unauthorized_client': 'The authenticated client is not authorized ' +
+                               'to use this authorization grant type.',
+
+        'unsupported_grant_type': 'The authorization grant type is not ' +
+                                  'supported by the authorization server.',
+
+        'invalid_scope': 'The requested scope is invalid, unknown, ' +
+                         'malformed, or exceeds the previously granted scope.'
+    }
+
+    def __init__(self, error_code):
+        """
+        If the error code provided is of one in the specified list, an
+        additional error_code_description property will be set. Its value will
+        be that of the description for the error code as defined in the oauth2
+        specification.
+
+            error_code - A single error code. Should be one of the following
+              (although this will not be enforced):
+                
+                invalid_request
+
+                invalid_client
+
+                invalid_grant
+
+                unauthorized_client
+
+                unsupported_grant_type
+
+                invalid_scope
+        """
+        self.error_code = error_code
+        self.error_code_description = AccessTokenRequestError.error_code_descriptions.get(error_code)
 
 
 class AccessTokenResponseError(OAuth2Error):
