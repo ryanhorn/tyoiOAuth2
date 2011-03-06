@@ -245,3 +245,28 @@ class TestOAuth2Client(unittest.TestCase):
         token = oauth2.AccessToken(access_token="test_access_token")
 
         self.assertRaises(oauth2.AccessTokenRequestError, client.refresh_access_token, token)
+
+    def test_refresh_access_token_no_token_in_response(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              grant_type='client_credentials')
+
+        token = oauth2.AccessToken(access_token="test_access_token", refresh_token="test_refresh_token")
+
+        urlopen_mock = self._create_urlopen_mock()
+        resp_mock = self._create_file_mock()
+
+        urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=refresh_token&refresh_token=test_refresh_token&client_id=test_client_id',
+                     {}).AndReturn(resp_mock)
+        resp_mock.read().AndReturn('{"not_access_token": "value"}')
+
+        # Monkey patch
+        tmp = oauth2.urlopen
+        oauth2.urlopen = urlopen_mock
+
+        self._mox.ReplayAll()
+        self.assertRaises(oauth2.AccessTokenResponseError, client.refresh_access_token, token)
+        self._mox.VerifyAll()
+
+        oauth2.urlopen = tmp
