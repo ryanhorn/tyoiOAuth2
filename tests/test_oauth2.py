@@ -323,3 +323,9 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('invalid_scope', error.error_code)
         self.assertEquals('The requested scope is invalid, unknown, malformed, or exceeds the previously granted scope.', error.error_code_description)
 
+    def test_access_token_request_optional_params(self):
+        error = oauth2.AccessTokenRequestError(error_code='unknown', error_description='Bad request', error_uri='http://www.example.com/errors/bad_request')
+        self.assertEquals('unknown', error.error_code)
+        self.assertTrue(error.error_code_description is None)
+        self.assertEquals('Bad request', error.error_description)
+        self.assertEquals('http://www.example.com/errors/bad_request', error.error_uri)

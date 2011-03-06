@@ -43,7 +43,7 @@ class AccessTokenRequestError(OAuth2Error):
                          'malformed, or exceeds the previously granted scope.'
     }
 
-    def __init__(self, error_code):
+    def __init__(self, error_code, error_description=None, error_uri=None):
         """
         If the error code provided is of one in the specified list, an
         additional error_code_description property will be set. Its value will
@@ -67,6 +67,8 @@ class AccessTokenRequestError(OAuth2Error):
         """
         self.error_code = error_code
         self.error_code_description = AccessTokenRequestError.error_code_descriptions.get(error_code)
+        self.error_description = error_description
+        self.error_uri = error_uri
 
 
 class AccessTokenResponseError(OAuth2Error):
