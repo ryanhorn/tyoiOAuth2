@@ -206,7 +206,7 @@ class TestOAuth2Client(unittest.TestCase):
 
         oauth2.urlopen = tmp
 
-    def test_request_refresh_token_with_default_parser_and_scope(self):
+    def test_refresh_access_token_with_default_parser_and_scope(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
                               access_token_endpoint='http://www.example.com/access_token',
@@ -235,3 +235,13 @@ class TestOAuth2Client(unittest.TestCase):
 
         self.assertEquals("test_refreshed_access_token", new_token.access_token)
         self.assertEquals(["perm1", "perm2"], new_token.scope)
+
+    def test_refresh_access_token_no_refresh_token(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              grant_type='client_credentials')
+
+        token = oauth2.AccessToken(access_token="test_access_token")
+
+        self.assertRaises(oauth2.AccessTokenRequestError, client.refresh_access_token, token)

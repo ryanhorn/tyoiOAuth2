@@ -155,6 +155,9 @@ class OAuth2Client(object):
             custom_parser - See documentation for the same argument in
               request_access_token
         """
+        if token.refresh_token is None:
+            raise AccessTokenRequestError('Provided token contains no refresh_token')
+
         def default_parser(resp):
             return loads(resp)
 
