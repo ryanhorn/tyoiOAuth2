@@ -14,6 +14,10 @@ class OAuth2Error(Exception):
     pass
 
 
+class AccessTokenRequestError(OAuth2Error):
+    pass
+
+
 class UnsupportedGrantTypeError(OAuth2Error):
     pass
 
@@ -122,6 +126,9 @@ class OAuth2Client(object):
 
                 scope - The permission scope (as a space delimited string)
         """
+        if 'authorization_code' == self._grant_type and code is None:
+            raise AccessTokenRequestError('code is required when using the "authorization_code" grant type')
+
         f = urlopen('%s?%s' % (self._access_token_endpoint,
                                urlencode({'client_id': self._client_id,
                                           'client_secret': self._client_secret,

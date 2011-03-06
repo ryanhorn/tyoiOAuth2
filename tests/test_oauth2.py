@@ -131,3 +131,12 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_token_type', token.token_type)
         self.assertEquals('3600', token.expires_in)
         self.assertEquals('test_refresh_token', token.refresh_token)
+
+    def test_request_access_token_authorization_code_no_code(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              auth_endpoint='http://www.example.com/auth',
+                              grant_type='authorization_code')
+
+        self.assertRaises(oauth2.AccessTokenRequestError, client.request_access_token)
