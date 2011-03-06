@@ -151,7 +151,7 @@ class TestOAuth2Client(unittest.TestCase):
                               auth_endpoint='http://www.example.com/auth',
                               grant_type='authorization_code')
 
-        self.assertRaises(oauth2.AccessTokenRequestError, client.request_access_token)
+        self.assertRaises(oauth2.OAuth2Error, client.request_access_token)
 
     def test_request_access_token_custom_parser(self):
         def parse_query_string_response(query):
@@ -244,7 +244,7 @@ class TestOAuth2Client(unittest.TestCase):
 
         token = oauth2.AccessToken(access_token="test_access_token")
 
-        self.assertRaises(oauth2.AccessTokenRequestError, client.refresh_access_token, token)
+        self.assertRaises(oauth2.OAuth2Error, client.refresh_access_token, token)
 
     def test_refresh_access_token_no_token_in_response(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',

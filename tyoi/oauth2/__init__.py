@@ -159,7 +159,7 @@ class OAuth2Client(object):
               request_access_token
         """
         if token.refresh_token is None:
-            raise AccessTokenRequestError('Provided token contains no refresh_token')
+            raise OAuth2Error('Provided token contains no refresh_token')
 
         parser = custom_parser or self._default_access_token_response_parser
         params = {'client_id': self._client_id, 'client_secret': self._client_secret, 'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
@@ -180,7 +180,7 @@ class OAuth2Client(object):
 
             code - The access code returned by an authorization request.
               Required for the "authorization_code" grant type. Raises
-              tyoi.oauth2.InvalidAccessTokenRequestError if not supplied
+              tyoi.oauth2.OAuth2Error if not supplied
               when using the "authorization_code" grant type
 
             custom_parser - A custom callable can be supplied to override the
@@ -200,7 +200,7 @@ class OAuth2Client(object):
                 scope - The permission scope (as a space delimited string)
         """
         if 'authorization_code' == self._grant_type and code is None:
-            raise AccessTokenRequestError('code is required when using the "authorization_code" grant type')
+            raise OAuth2Error('code is required when using the "authorization_code" grant type')
 
         parser = custom_parser or self._default_access_token_response_parser
 
