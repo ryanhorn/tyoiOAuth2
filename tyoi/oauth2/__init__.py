@@ -9,6 +9,8 @@ from urllib2 import urlopen
 
 from json import loads
 
+from datetime import datetime, timedelta
+
 
 class OAuth2Error(Exception):
     pass
@@ -27,7 +29,7 @@ class UnsupportedGrantTypeError(OAuth2Error):
 
 
 class AccessToken(object):
-    def __init__(self, access_token, token_type='bearer', expires_in=None,
+    def __init__(self, access_token, token_type='bearer', expires=None,
                  refresh_token=None, scope=None):
         """
         Sets the provided arguments.
@@ -38,17 +40,17 @@ class AccessToken(object):
 
             token_type - The token type
 
-            expires_in - Number of seconds until the token expires
+            expires - datetime.datetime object representing when the access
+              token expires
 
             refresh_token - A refresh token that can be used to generate new
               access tokens
 
-            scope - A list of requested permissions
-
+            scope - A list of permissions available to the access token
         """
         self.access_token = access_token
         self.token_type = token_type
-        self.expires_in = expires_in
+        self.expires = expires
         self.refresh_token = refresh_token
         self.scope = scope
 
@@ -172,6 +174,10 @@ class OAuth2Client(object):
 
         token_type = data.get('token_type')
         expires_in = data.get('expires_in')
+
+        if expires_in is not None:
+            expires_in = datetime.now() + timedelta(seconds=int(expires_in))
+
         refresh_token = data.get('refresh_token')
         scope = data.get('scope')
         return AccessToken(access_token, token_type, expires_in, refresh_token, scope)
