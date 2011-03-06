@@ -140,3 +140,34 @@ class TestOAuth2Client(unittest.TestCase):
                               grant_type='authorization_code')
 
         self.assertRaises(oauth2.AccessTokenRequestError, client.request_access_token)
+
+    def test_request_access_token_custom_parser(self):
+        def parse_query_string_response(query):
+            return dict([pair.split('=') for pair in query.split('&')])
+
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              grant_type='client_credentials')
+
+        urlopen_mock = self._create_urlopen_mock()
+        resp_mock = self._create_file_mock()
+
+        urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
+                     {}).AndReturn(resp_mock)
+        resp_mock.read().AndReturn('access_token=test_access_token&token_type=test_token_type&expires_in=3600&refresh_token=test_refresh_token')
+
+        # Monkey patch
+        tmp = oauth2.urlopen
+        oauth2.urlopen = urlopen_mock
+
+        self._mox.ReplayAll()
+        token = client.request_access_token(custom_parser=parse_query_string_response)
+        self._mox.VerifyAll()
+
+        oauth2.urlopen = tmp
+
+        self.assertEquals('test_access_token', token.access_token)
+        self.assertEquals('test_token_type', token.token_type)
+        self.assertEquals('3600', token.expires_in)
+        self.assertEquals('test_refresh_token', token.refresh_token)

@@ -129,12 +129,17 @@ class OAuth2Client(object):
         if 'authorization_code' == self._grant_type and code is None:
             raise AccessTokenRequestError('code is required when using the "authorization_code" grant type')
 
+        def default_parser(resp):
+            return loads(resp)
+
+        parser = custom_parser or default_parser
+
         f = urlopen('%s?%s' % (self._access_token_endpoint,
                                urlencode({'client_id': self._client_id,
                                           'client_secret': self._client_secret,
                                           'grant_type': self._grant_type})),
                                {})
-        data = loads(f.read())
+        data = parser(f.read())
         access_token = data.get('access_token')
         token_type = data.get('token_type')
         expires_in = data.get('expires_in')
