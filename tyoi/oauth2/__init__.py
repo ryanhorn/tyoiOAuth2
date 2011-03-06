@@ -145,6 +145,9 @@ class OAuth2Client(object):
 
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
 
+    def _default_access_token_response_parser(self, resp):
+        return loads(resp)
+
     def refresh_access_token(self, token, custom_parser=None):
         """
         Generates and returns a new access token for the provided contained
@@ -158,10 +161,7 @@ class OAuth2Client(object):
         if token.refresh_token is None:
             raise AccessTokenRequestError('Provided token contains no refresh_token')
 
-        def default_parser(resp):
-            return loads(resp)
-
-        parser = custom_parser or default_parser
+        parser = custom_parser or self._default_access_token_response_parser
         params = {'client_id': self._client_id, 'client_secret': self._client_secret, 'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
         if token.scope is not None:
             params['scope'] = ' '.join(token.scope)
@@ -202,10 +202,7 @@ class OAuth2Client(object):
         if 'authorization_code' == self._grant_type and code is None:
             raise AccessTokenRequestError('code is required when using the "authorization_code" grant type')
 
-        def default_parser(resp):
-            return loads(resp)
-
-        parser = custom_parser or default_parser
+        parser = custom_parser or self._default_access_token_response_parser
 
         f = urlopen('%s?%s' % (self._access_token_endpoint,
                                urlencode({'client_id': self._client_id,
