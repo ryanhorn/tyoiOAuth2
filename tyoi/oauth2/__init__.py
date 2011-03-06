@@ -118,6 +118,10 @@ class OAuth2Client(object):
 
         refresh_token = token_data.get('refresh_token')
         scope = token_data.get('scope')
+
+        if scope is not None:
+            scope = scope.split(' ')
+
         return AccessToken(access_token, token_type, expires_in, refresh_token, scope)
 
     def get_auth_uri(self, state=None):
@@ -140,6 +144,29 @@ class OAuth2Client(object):
             params['state'] = state
 
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
+
+    def refresh_access_token(self, token, custom_parser=None):
+        """
+        Generates and returns a new access token for the provided contained
+        refresh token
+
+            token - The AccessToken instance containing a refresh_token
+
+            custom_parser - See documentation for the same argument in
+              request_access_token
+        """
+        def default_parser(resp):
+            return loads(resp)
+
+        parser = custom_parser or default_parser
+        params = {'client_id': self._client_id, 'client_secret': self._client_secret, 'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
+        if token.scope is not None:
+            params['scope'] = ' '.join(token.scope)
+
+        f = urlopen('%s?%s' % (self._access_token_endpoint,
+                               urlencode(params)),
+                               {})
+        return self._create_access_token(parser(f.read()))
 
     def request_access_token(self, code=None, custom_parser=None):
         """
