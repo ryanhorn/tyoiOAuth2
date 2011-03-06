@@ -29,6 +29,23 @@ class UnsupportedGrantTypeError(OAuth2Error):
 class AccessToken(object):
     def __init__(self, access_token, token_type='bearer', expires_in=None,
                  refresh_token=None, scope=None):
+        """
+        Sets the provided arguments.
+
+            access_token - The access token
+
+            client_secret - The client secret
+
+            token_type - The token type
+
+            expires_in - Number of seconds until the token expires
+
+            refresh_token - A refresh token that can be used to generate new
+              access tokens
+
+            scope - A list of requested permissions
+
+        """
         self.access_token = access_token
         self.token_type = token_type
         self.expires_in = expires_in
@@ -36,6 +53,10 @@ class AccessToken(object):
         self.scope = scope
 
     def __str__(self):
+        """
+        Returns a string representation, which in this case is the access token
+        string
+        """
         return self.access_token
 
 
