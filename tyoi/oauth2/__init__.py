@@ -18,6 +18,10 @@ class AccessTokenRequestError(OAuth2Error):
     pass
 
 
+class AccessTokenResponseError(OAuth2Error):
+    pass
+
+
 class UnsupportedGrantTypeError(OAuth2Error):
     pass
 
@@ -141,6 +145,10 @@ class OAuth2Client(object):
                                {})
         data = parser(f.read())
         access_token = data.get('access_token')
+
+        if access_token is None:
+            raise AccessTokenResponseError('No access token returned in response')
+
         token_type = data.get('token_type')
         expires_in = data.get('expires_in')
         refresh_token = data.get('refresh_token')
