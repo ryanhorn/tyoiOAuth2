@@ -183,6 +183,15 @@ class TestOAuth2Client(unittest.TestCase):
 
         self.assertRaises(oauth2.OAuth2Error, client.request_access_token)
 
+    def test_request_access_token_authorization_code_no_redirect_uri(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              auth_endpoint='http://www.example.com/auth',
+                              grant_type='authorization_code')
+
+        self.assertRaises(oauth2.OAuth2Error, client.request_access_token, 'test_code')
+
     def test_request_access_token_custom_parser(self):
         def parse_query_string_response(query):
             return dict([pair.split('=') for pair in query.split('&')])
