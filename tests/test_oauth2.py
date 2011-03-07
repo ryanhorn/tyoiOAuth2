@@ -4,6 +4,7 @@ import mox
 
 from tyoi import oauth2
 
+
 class TestOAuth2Client(unittest.TestCase):
 
     def setUp(self):
@@ -206,7 +207,7 @@ class TestOAuth2Client(unittest.TestCase):
 
         oauth2.urlopen = tmp
 
-    def _test_request_access_token_error_response(self):
+    def test_request_access_token_error_response(self):
         from urllib2 import HTTPError
 
         client = oauth2.OAuth2Client(client_id='test_client_id',
@@ -215,23 +216,34 @@ class TestOAuth2Client(unittest.TestCase):
                                      grant_type='client_credentials')
 
         urlopen_mock = self._create_urlopen_mock()
-        resp_mock = self._create_file_mock()
 
-        error_response = '{"error": "invalid_request"}'
+        # HTTPError.read cannot be directly mocked, so we need to stub it in
+        def read(self):
+            return '{"error": "invalid_request", "error_description": "error description", "error_uri": "http://www.example.com/error"}'
+
+        HTTPError.read = read
+        http_error = HTTPError('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id', 400, 'Bad Request', {}, None)
+
         urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
-                     {}).AndRaise(HTTPError('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id',
-                                            400, '', {}, resp_mock))
-        resp_mock.read().AndReturn('{"not_access_token": "value"}')
+                     {}).AndRaise(http_error)
 
         # Monkey patch
         tmp = oauth2.urlopen
         oauth2.urlopen = urlopen_mock
 
         self._mox.ReplayAll()
-        self.assertRaises(oauth2.AccessTokenResponseError, client.request_access_token)
-        self._mox.VerifyAll()
-
-        oauth2.urlopen = tmp
+        try:
+            client.request_access_token()
+        except oauth2.AccessTokenRequestError as e:
+            self.assertEquals('invalid_request', e.error_code)
+            self.assertEquals('error description', e.error_description)
+            self.assertEquals('http://www.example.com/error', e.error_uri)
+        except Exception as ex:
+            self.fail('Expected exception oauth2.AccessTokenRequestError not raised. Got error %s' % ex)
+        finally:
+            self._mox.VerifyAll()
+            oauth2.urlopen = tmp
+            del HTTPError.read
 
     def test_refresh_access_token_with_default_parser_and_scope(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',

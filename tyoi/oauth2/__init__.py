@@ -5,7 +5,7 @@ Implements the application side of OAuth2 for the "authoriztion_code" and
 
 from urllib import urlencode
 
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError
 
 from json import loads
 
@@ -255,9 +255,22 @@ class OAuth2Client(object):
 
         parser = custom_parser or self._default_access_token_response_parser
 
-        f = urlopen('%s?%s' % (self._access_token_endpoint,
-                               urlencode({'client_id': self._client_id,
-                                          'client_secret': self._client_secret,
-                                          'grant_type': self._grant_type})),
-                               {})
+        try:
+            f = urlopen('%s?%s' % (self._access_token_endpoint,
+                                   urlencode({'client_id': self._client_id,
+                                              'client_secret': self._client_secret,
+                                              'grant_type': self._grant_type})),
+                                   {})
+        except HTTPError as e:
+            try:
+                error_resp = e.read()
+                error_data = parser(error_resp)
+            except Exception:
+                raise AccessTokenResponseError('Access request returned an error, but the response could not be read: %s ' % error_resp)
+
+            if error_data.get('error') is None:
+                raise AccessTokenResponseError('Access request returned an error, but did not include an error code')
+
+            raise AccessTokenRequestError(error_data['error'], error_data.get('error_description'), error_data.get('error_uri'))
+
         return self._create_access_token(parser(f.read()))
