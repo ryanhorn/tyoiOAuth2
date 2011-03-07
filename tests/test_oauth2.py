@@ -78,6 +78,19 @@ class TestOAuth2Client(unittest.TestCase):
             client.get_auth_uri()
         )
 
+    def test_get_auth_uri_with_redirect_uri(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='test',
+                              grant_type='authorization_code',
+                              auth_endpoint='http://www.example.com/oauth',
+                              redirect_uri='http://www.example.com/')
+
+        self.assertEquals(
+            'http://www.example.com/oauth?redirect_uri=http%3A%2F%2Fwww.example.com%2F&response_type=code&client_id=test_client_id',
+            client.get_auth_uri()
+        )
+
     def test_access_token(self):
         from datetime import datetime
         expires = datetime.now()

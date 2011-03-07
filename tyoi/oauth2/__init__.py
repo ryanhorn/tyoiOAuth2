@@ -194,6 +194,9 @@ class OAuth2Client(object):
         if state is not None:
             params['state'] = state
 
+        if self._redirect_uri is not None:
+            params['redirect_uri'] = self._redirect_uri
+
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
 
     def _default_access_token_response_parser(self, resp):
