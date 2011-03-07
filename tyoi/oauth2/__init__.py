@@ -208,7 +208,7 @@ class OAuth2Client(object):
         except HTTPError as e:
             try:
                 error_resp = e.read()
-                error_data = parser(e.read())
+                error_data = loads(error_resp)
             except Exception:
                 raise AccessTokenResponseError('Access request returned an error, but the response could not be read: %s ' % error_resp)
 
