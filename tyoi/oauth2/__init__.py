@@ -266,10 +266,16 @@ class OAuth2Client(object):
 
                 scope - The permission scope (as a space delimited string)
         """
-        if 'authorization_code' == self._grant_type and code is None:
-            raise OAuth2Error('code is required when using the "authorization_code" grant type')
-
-        return self._request_access_token(
-                 {'client_id': self._client_id,
+        params = {'client_id': self._client_id,
                   'client_secret': self._client_secret,
-                  'grant_type': self._grant_type}, custom_parser)
+                  'grant_type': self._grant_type}
+
+        if 'authorization_code' == self._grant_type:
+            if code is None:
+                raise OAuth2Error('code is required when using the "authorization_code" grant type')
+            if self._redirect_uri is None:
+                raise OAuth2Error('redirect_uri is required when requesting an access token using the "authorization_code" grant type')
+            params['code'] = code
+            params['redirect_uri'] = self._redirect_uri
+
+        return self._request_access_token(params, custom_parser)
