@@ -199,11 +199,8 @@ class OAuth2Client(object):
 
         return '%s?%s' % (self._auth_endpoint, urlencode(params))
 
-    def _default_access_token_response_parser(self, resp):
-        return loads(resp)
-
     def _request_access_token(self, params, custom_parser=None):
-        parser = custom_parser or self._default_access_token_response_parser
+        parser = custom_parser or loads
 
         try:
             f = urlopen('%s?%s' % (self._access_token_endpoint,
