@@ -242,7 +242,7 @@ class OAuth2Client(object):
 
         return self._request_access_token(params, custom_parser)
 
-    def request_access_token(self, code=None, custom_parser=None):
+    def request_access_token(self, code=None, scope=None, custom_parser=None):
         """
         Builds the access token request url, sends a POST request using
         application/x-www-form-urlencoded encoding. If no custom parser is
@@ -281,5 +281,8 @@ class OAuth2Client(object):
                 raise OAuth2Error('redirect_uri is required when requesting an access token using the "authorization_code" grant type')
             params['code'] = code
             params['redirect_uri'] = self._redirect_uri
+
+        if scope is not None:
+            params['scope'] = ' '.join(scope)
 
         return self._request_access_token(params, custom_parser)

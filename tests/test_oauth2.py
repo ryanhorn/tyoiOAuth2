@@ -184,6 +184,31 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_access_token', token.access_token)
         self.assertEquals('test_token_type', token.token_type)
 
+    def test_request_access_token_with_scope(self):
+        client = oauth2.OAuth2Client(client_id='test_client_id',
+                              client_secret='test_client_secret',
+                              access_token_endpoint='http://www.example.com/access_token',
+                              grant_type='client_credentials',
+                              auth_endpoint='http://www.example.com/auth')
+
+        urlopen_mock = self._create_urlopen_mock()
+        resp_mock = self._create_file_mock()
+
+        urlopen_mock('http://www.example.com/access_token?client_secret=test_client_secret&grant_type=client_credentials&client_id=test_client_id&scope=perm1+perm2',
+                     {}).AndReturn(resp_mock)
+        resp_mock.read().AndReturn('{"access_token": "test_access_token",\
+                                     "token_type": "test_token_type"}')
+
+        # Monkey patch
+        tmp = oauth2.urlopen
+        oauth2.urlopen = urlopen_mock
+
+        self._mox.ReplayAll()
+        token = client.request_access_token(scope=['perm1', 'perm2'])
+        self._mox.VerifyAll()
+
+        oauth2.urlopen = tmp
+
     def test_request_access_token_authorization_code_no_code(self):
         client = oauth2.OAuth2Client(client_id='test_client_id',
                               client_secret='test_client_secret',
