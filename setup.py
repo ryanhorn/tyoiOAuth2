@@ -10,5 +10,5 @@ setup(
     url="https://github.com/ryanhorn/tyoiOAuth2",
     packages=["tyoi", "tyoi.oauth2"],
     test_suite="tests",
-    tests_requre=["mox"]
+    tests_require=["mox"]
 )
