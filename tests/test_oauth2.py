@@ -361,7 +361,7 @@ class TestOAuth2Client(unittest.TestCase):
 
         oauth2.urlopen = tmp
 
-    def test_access_token_request_all_error_codes(self):
+    def test_access_token_error_all_error_codes(self):
         error = oauth2.AccessTokenRequestError(error_code='invalid_request')
         self.assertEquals('invalid_request', error.error_code)
         self.assertEquals('The request is missing a unsupported parameter or parameter, includes multiple credentials, utilizes more than one mechanism for authenticating the client, or is otherwise malformed.', error.error_code_description)
@@ -389,6 +389,12 @@ class TestOAuth2Client(unittest.TestCase):
         error = oauth2.AccessTokenRequestError(error_code='unknown_code')
         self.assertEquals('unknown_code', error.error_code)
         self.assertEquals('Unknown error code', error.error_code_description)
+
+    def test_access_token_error_to_string(self):
+        error = oauth2.AccessTokenRequestError(error_code='invalid_scope')
+        expected = 'invalid_scope: The requested scope is invalid, unknown, '\
+                   'malformed, or exceeds the previously granted scope.'
+        self.assertEquals(expected, str(error))
 
     def test_access_token_request_optional_params(self):
         error = oauth2.AccessTokenRequestError(error_code='unknown', error_description='Bad request', error_uri='http://www.example.com/errors/bad_request')

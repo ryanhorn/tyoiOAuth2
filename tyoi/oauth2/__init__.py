@@ -70,6 +70,9 @@ class AccessTokenRequestError(OAuth2Error):
         self.error_description = error_description
         self.error_uri = error_uri
 
+    def __str__(self):
+        return '%s: %s' % (self.error_code, self.error_code_description)
+
 
 class AccessTokenResponseError(OAuth2Error):
     pass
