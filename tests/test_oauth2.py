@@ -29,8 +29,7 @@ class TestOAuth2Client(unittest.TestCase):
                         access_token_endpoint='test_access_token_endpoint',
                         auth_endpoint='test_auth_endpoint',
                         grant_type='authorization_code',
-                        redirect_uri='test_redirect_uri',
-                        scope=['test_scope_1', 'test_scope_2'])
+                        redirect_uri='test_redirect_uri')
 
         self.assertEquals('test_client_id', client._client_id)
         self.assertEquals('test_client_secret', client._client_secret)
@@ -39,7 +38,6 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_auth_endpoint', client._auth_endpoint)
         self.assertEquals('authorization_code', client._grant_type)
         self.assertEquals('test_redirect_uri', client._redirect_uri)
-        self.assertEquals(['test_scope_1', 'test_scope_2'], client._scope)
 
     def test_auth_code_without_auth_endpoint(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client, client_id='test',
@@ -70,12 +68,11 @@ class TestOAuth2Client(unittest.TestCase):
                               client_secret='test_client_secret',
                               access_token_endpoint='test',
                               grant_type='authorization_code',
-                              auth_endpoint='http://www.example.com/oauth',
-                              scope=('perm1', 'perm2', 'perm3'))
+                              auth_endpoint='http://www.example.com/oauth')
 
         self.assertEquals(
             'http://www.example.com/oauth?scope=perm1+perm2+perm3&response_type=code&client_id=test_client_id',
-            client.get_auth_uri()
+            client.get_auth_uri(scope=['perm1', 'perm2', 'perm3'])
         )
 
     def test_get_auth_uri_with_redirect_uri(self):
@@ -114,7 +111,7 @@ class TestOAuth2Client(unittest.TestCase):
 
         self.assertEquals(
             'http://www.example.com/oauth?state=test_state&response_type=code&client_id=test_client_id',
-            client.get_auth_uri('test_state')
+            client.get_auth_uri(state='test_state')
         )
 
     def test_request_access_token_client_credentials_no_code_no_custom_parser(self):

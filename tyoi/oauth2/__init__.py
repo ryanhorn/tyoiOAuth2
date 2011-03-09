@@ -118,8 +118,7 @@ class AccessToken(object):
 
 class OAuth2Client(object):
     def __init__(self, client_id, client_secret, grant_type,
-                 access_token_endpoint, auth_endpoint=None, redirect_uri=None,
-                 scope=None):
+                 access_token_endpoint, auth_endpoint=None, redirect_uri=None):
         """
         Sets the provided arguments.
 
@@ -139,8 +138,6 @@ class OAuth2Client(object):
 
             redirect_uri - The uri to redirect the user to after
                            authentication/authorization
-
-            scope - An iterable of requested permissions
         """
         if grant_type not in ('authorization_code', 'client_credentials'):
             raise UnsupportedGrantTypeError('Unsupported grant type "%s"' %
@@ -156,7 +153,6 @@ class OAuth2Client(object):
         self._access_token_endpoint = access_token_endpoint
         self._auth_endpoint = auth_endpoint
         self._redirect_uri = redirect_uri
-        self._scope = scope
 
     def _create_access_token(self, token_data):
         access_token = token_data.get('access_token')
@@ -178,9 +174,11 @@ class OAuth2Client(object):
 
         return AccessToken(access_token, token_type, expires_in, refresh_token, scope)
 
-    def get_auth_uri(self, state=None):
+    def get_auth_uri(self, scope=None, state=None):
         """
         Returns the uri for user authentication/authorization
+
+            scope - An iterable of requested permissions
 
             state - The state argument will be passed back when the user is
                     redirected back to the application after authenticating
@@ -191,8 +189,8 @@ class OAuth2Client(object):
 
         params = {'response_type': 'code', 'client_id': self._client_id}
 
-        if self._scope is not None:
-            params['scope'] = ' '.join(self._scope)
+        if scope is not None:
+            params['scope'] = ' '.join(scope)
 
         if state is not None:
             params['state'] = state
@@ -235,7 +233,10 @@ class OAuth2Client(object):
         if token.refresh_token is None:
             raise OAuth2Error('Provided token contains no refresh_token')
 
-        params = {'client_id': self._client_id, 'client_secret': self._client_secret, 'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
+        params = {'client_id': self._client_id,
+                  'client_secret': self._client_secret,
+                  'grant_type': 'refresh_token',
+                  'refresh_token': token.refresh_token}
         if token.scope is not None:
             params['scope'] = ' '.join(token.scope)
 
