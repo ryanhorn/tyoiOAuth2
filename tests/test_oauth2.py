@@ -3,6 +3,7 @@ import unittest
 import mox
 
 from tyoi import oauth2
+from tyoi.oauth2 import authenticators
 
 
 class TestOAuth2Client(unittest.TestCase):
@@ -16,6 +17,16 @@ class TestOAuth2Client(unittest.TestCase):
 
     def _create_file_mock(self):
         return self._mox.CreateMock(file)
+
+    def test_authenticator_client_credentials(self):
+        auth = authenticators.ClientCredentials(id='test_id', secret='test_secret')
+        self.assertEquals('test_id', auth._id)
+        self.assertEquals('test_secret', auth._secret)
+        params = {}
+        headers = {}
+        auth(params, headers)
+        self.assertEquals('test_id', params['client_id'])
+        self.assertEquals('test_secret', params['client_secret'])
 
     def test_new_o_auth2_client_bad_grant_type(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client,
