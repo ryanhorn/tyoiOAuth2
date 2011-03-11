@@ -78,10 +78,6 @@ class AccessTokenResponseError(OAuth2Error):
     pass
 
 
-class UnsupportedGrantTypeError(OAuth2Error):
-    pass
-
-
 class AccessToken(object):
     def __init__(self, access_token, token_type='bearer', expires=None,
                  refresh_token=None, scope=None):
@@ -89,8 +85,6 @@ class AccessToken(object):
         Sets the provided arguments.
 
             access_token - The access token
-
-            client_secret - The client secret
 
             token_type - The token type
 
@@ -140,7 +134,7 @@ class OAuth2Client(object):
                            authentication/authorization
         """
         if grant_type not in ('authorization_code', 'client_credentials'):
-            raise UnsupportedGrantTypeError('Unsupported grant type "%s"' %
+            raise OAuth2Error('Unsupported grant type "%s"' %
                                             grant_type)
 
         if 'authorization_code' == grant_type and auth_endpoint is None:

@@ -18,7 +18,7 @@ class TestOAuth2Client(unittest.TestCase):
         return self._mox.CreateMock(file)
 
     def test_new_o_auth2_client_bad_grant_type(self):
-        self.assertRaises(oauth2.UnsupportedGrantTypeError, oauth2.OAuth2Client,
+        self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',
                           access_token_endpoint='test',
                           grant_type='bad_grant_type')
