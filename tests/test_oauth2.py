@@ -28,6 +28,23 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('test_id', params['client_id'])
         self.assertEquals('test_secret', params['client_secret'])
 
+    def test_new_access_token_request(self):
+        def test_callable():
+            pass
+        req = oauth2.AccessTokenRequest(authenticator=test_callable,
+                                        grant=test_callable,
+                                        endpoint='test_endpoint')
+
+        self.assertEquals(test_callable, req._authenticator)
+        self.assertEquals(test_callable, req._grant)
+        self.assertEquals('test_endpoint', req._endpoint)
+
+    def test_new_access_token_request_bad_params(self):
+        def test_callable():
+            pass
+        self.assertRaises(oauth2.OAuth2Error, oauth2.AccessTokenRequest, 'not a callable', test_callable, 'test_endpoint')
+        self.assertRaises(oauth2.OAuth2Error, oauth2.AccessTokenRequest, test_callable, 'not a callable', 'test_endpoint')
+
     def test_new_o_auth2_client_bad_grant_type(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',

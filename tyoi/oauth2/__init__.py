@@ -78,6 +78,19 @@ class AccessTokenResponseError(OAuth2Error):
     pass
 
 
+class AccessTokenRequest(object):
+    def __init__(self, authenticator, grant, endpoint):
+        if not callable(authenticator):
+            raise OAuth2Error('authenticator must be callable')
+
+        if not callable(grant):
+            raise OAuth2Error('grant must be callable')
+
+        self._authenticator = authenticator
+        self._grant = grant
+        self._endpoint = endpoint
+
+
 class AccessToken(object):
     def __init__(self, access_token, token_type='bearer', expires=None,
                  refresh_token=None, scope=None):
