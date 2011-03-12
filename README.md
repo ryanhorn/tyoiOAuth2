@@ -3,7 +3,7 @@ Overview
 This module provides a set of components, which together serve as an OAuth2 
 "Client" capable of issuing access token requests to an OAuth2 "Authorization 
 Server" on behalf of a "Resource Owner" (see 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-1.1 for the various 
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-1.1](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-1.1) for the various 
 role definitions). It is designed for flexibility and extensibility by 
 decoupling the different parts of an access token request.
 
@@ -61,7 +61,7 @@ request parameters and/or headers.
 
 #### tyoi.oauth2.authenticators.ClientPassword
 Implements Client Password authentication (see 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-2.1)
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-2.1](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-2.1))
 
 Instantiate with the following arguments:
 
@@ -81,7 +81,7 @@ request parameters.
 
 #### tyoi.oauth2.grants.AuthorizationCode
 Implements the Authorization Code grant type (see 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.1)
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.1](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.1))
 
 Instantiate with the following arguments:
 
@@ -102,7 +102,7 @@ following arguments:
 
 #### tyoi.oauth2.grants.ClientCredentials
 Implements the Client Credentials grant type (see 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.4)
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.4](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-4.4))
 
 Instantiate with the following arguments:
 
@@ -111,7 +111,7 @@ Instantiate with the following arguments:
 
 #### tyoi.oauth2.grants.RefreshToken
 Implements the Refresh Token grant type (see 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-6)
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-6](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-6))
 
 Instantiate with the following arguments:
 
@@ -155,7 +155,7 @@ Handling Errors
 ===================================================================
 If the server responds to an access token request with an error code, the 
 request object will attempt to parse the response body as per 
-http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-5.2. If the body 
+[http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-5.2](http://tools.ietf.org/html/draft-ietf-oauth-v2-12#section-5.2). If the body 
 *can* be parsed, an AccessTokenRequestError will be raised. This object will 
 contain the following properties:
 
