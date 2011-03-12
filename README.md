@@ -42,8 +42,8 @@ properties:
 
 * access_token - The access token string
 * token_type - The access token type
-* expires - A datetime.datetime object representing when the access token 
-* expires
+* expires - A datetime.datetime object representing when the access token
+  expires
 * refresh_token - A refresh token that can be used to generate new access 
 * tokens
 * scope - A list of permissions available to the access token
@@ -161,11 +161,11 @@ contain the following properties:
 
 * error_code - The error code
 * error_code_description - The error code description as listed in the 
-                           specification or "Unknown code".
+  specification or "Unknown code".
 * error_description - The error description (or None if no error description 
-                      was returned)
+  was returned)
 * error_uri - The uri to a web page with more information on the error (or None 
-              if no error uri was returned)
+  if no error uri was returned)
 
 If the body *cannot* be parsed, an AccessTokenResponseError will be raised with 
 the string included in the body.
