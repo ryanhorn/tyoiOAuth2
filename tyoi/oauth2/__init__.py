@@ -100,7 +100,7 @@ class AccessTokenRequest(object):
         headers = {}
         self._authenticator(params, headers)
         self._grant(params)
-        return Request('%s?%s' % (self._endpoint, urlencode(params)), {}, headers)
+        return Request(self._endpoint, urlencode(params), headers)
 
     def send(self, response_decoder=None):
         """

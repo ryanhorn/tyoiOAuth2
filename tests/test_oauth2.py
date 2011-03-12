@@ -49,11 +49,9 @@ class TestTokenRequest(unittest.TestCase):
 
         self._mox.StubOutClassWithMocks(oauth2, 'Request')
 
-        url_req = oauth2.Request('http://www.example.com?'
-                                 'test_grant_param=test_grant_param_value&'
-                                 'test_authenticator_param='
-                                 'test_authenticator_param_value',
-                                 {}, {'test_header': 'test_header_value'})
+        url_req = oauth2.Request('http://www.example.com',
+                                 'test_grant_param=test_grant_param_value&test_authenticator_param=test_authenticator_param_value',
+                                 {'test_header': 'test_header_value'})
 
         self._mox.ReplayAll()
         result = req.build_url_request()
