@@ -37,3 +37,9 @@ class RefreshToken(object):
     def __init__(self, refresh_token, scope=None):
         self._refresh_token = refresh_token
         self._scope = scope
+
+    def __call__(self, parameters):
+        parameters['grant_type'] = 'refresh_token'
+        parameters['refresh_token'] = self._refresh_token
+        if self._scope is not None:
+            parameters['scope'] = ' '.join(self._scope)
