@@ -19,6 +19,21 @@ class AuthorizationCode(object):
 
     @staticmethod
     def build_auth_uri(endpoint, client_id, redirect_uri=None, scope=None, state=None):
+        """
+        Helper method builds the uri that a user must be redirected to for
+        authentication/authorization using the authorization_code grant type.
+
+            endpoint - The authorization endpoint
+
+            client_id - The client id
+
+            redirect_uri - The redirect uri
+
+            scope - A list of permissions to request
+
+            state - An application state that will be sent back by the
+              authorization server
+        """
         params = {'response_type': 'code', 'client_id': client_id}
         if redirect_uri is not None:
             params['redirect_uri'] = redirect_uri
