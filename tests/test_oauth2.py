@@ -587,3 +587,11 @@ class TestOAuth2AuthorizationCodeGrant(unittest.TestCase):
         grant = grants.AuthorizationCode(code='test_code', redirect_uri='test_redirect_uri')
         self.assertEquals('test_code', grant._code)
         self.assertEquals('test_redirect_uri', grant._redirect_uri)
+
+    def test_call(self):
+        grant = grants.AuthorizationCode(code='test_code', redirect_uri='test_redirect_uri')
+        params = {}
+        grant(params)
+        self.assertEquals('test_code', params['code'])
+        self.assertEquals('test_redirect_uri', params['redirect_uri'])
+        self.assertEquals('authorization_code', params['grant_type'])
