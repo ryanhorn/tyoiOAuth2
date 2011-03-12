@@ -28,3 +28,12 @@ class ClientCredentials(object):
         parameters['grant_type'] = 'client_credentials'
         if self._scope is not None:
             parameters['scope'] = ' '.join(self._scope)
+
+class RefreshToken(object):
+    """
+    Callable which adds the appropriate parameters for requesting an access
+    token using the refresh_token grant type
+    """
+    def __init__(self, refresh_token, scope=None):
+        self._refresh_token = refresh_token
+        self._scope = scope

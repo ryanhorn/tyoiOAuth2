@@ -616,3 +616,8 @@ class TestOAuth2GrantTypes(unittest.TestCase):
         grant(params)
         self.assertEquals('client_credentials', params['grant_type'])
         self.assertEquals('perm1 perm2', params['scope'])
+
+    def test_new_refresh_token(self):
+        grant = grants.RefreshToken('test_refresh_token')
+        self.assertEquals('test_refresh_token', grant._refresh_token)
+        self.assertEquals(None, grant._scope)
