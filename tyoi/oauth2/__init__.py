@@ -130,7 +130,19 @@ class AccessTokenRequest(object):
             decoder = response_decoder
 
         request = self.build_url_request()
-        f = urlopen(request)
+        try:
+            f = urlopen(request)
+        except HTTPError as e:
+            try:
+                error_resp = e.read()
+                error_data = loads(error_resp)
+            except Exception:
+                raise AccessTokenResponseError('Access request returned an error, but the response could not be read: %s ' % error_resp)
+
+            if error_data.get('error') is None:
+                raise AccessTokenResponseError('Access request returned an error, but did not include an error code')
+
+            raise AccessTokenRequestError(error_data['error'], error_data.get('error_description'), error_data.get('error_uri'))
         token_data = decoder(f.read())
         return self._create_access_token(token_data)
 

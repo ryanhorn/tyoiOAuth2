@@ -139,6 +139,43 @@ class TestOAuth2Client(unittest.TestCase):
 
         self._mox.UnsetStubs()
 
+    def test_send_error_response(self):
+        from urllib2 import HTTPError
+
+        def test_callable():
+            pass
+
+        req = oauth2.AccessTokenRequest(authenticator=test_callable,
+                                        grant=test_callable,
+                                        endpoint='test_endpoint')
+
+        self._mox.StubOutWithMock(req, 'build_url_request')
+        self._mox.StubOutWithMock(oauth2, 'urlopen')
+
+        # HTTPError.read cannot be directly mocked, so we need to stub it in
+        def read(self):
+            return '{"error": "invalid_request", "error_description": "error description", "error_uri": "http://www.example.com/error"}'
+
+        HTTPError.read = read
+        http_error = HTTPError('test return value', 400, 'Bad Request', {}, None)
+
+        req.build_url_request().AndReturn('test return value')
+        oauth2.urlopen('test return value').AndRaise(http_error)
+
+        self._mox.ReplayAll()
+        try:
+            req.send()
+        except oauth2.AccessTokenRequestError as e:
+            self.assertEquals('invalid_request', e.error_code)
+            self.assertEquals('error description', e.error_description)
+            self.assertEquals('http://www.example.com/error', e.error_uri)
+        except Exception as ex:
+            self.fail('Expected exception oauth2.AccessTokenRequestError not raised. Got error %s' % ex)
+        finally:
+            self._mox.VerifyAll()
+            self._mox.UnsetStubs()
+            del HTTPError.read
+
     def test_new_o_auth2_client_bad_grant_type(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',
