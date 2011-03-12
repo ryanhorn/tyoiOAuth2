@@ -102,6 +102,54 @@ class AccessTokenRequest(object):
         self._grant(params)
         return Request('%s?%s' % (self._endpoint, urlencode(params)), {}, headers)
 
+    def send(self, response_decoder=None):
+        """
+        Creates and sends a request to the OAuth server, decodes the response
+        and returns the resulting token object.
+
+            response_decoder - A custom callable can be supplied to override
+              the default method of extracting AccessToken parameters from the
+              response. This is necessary for server implementations which do
+              not conform to the more recent OAuth2 specification
+              (ex: Facebook). By default, this will assume the response is
+              encoded using JSON. The callable should return a dictionary with
+              keys and values as follows:
+
+                access_token - The access token
+
+                token_type - The token type
+
+                expires_in - The number of seconds in which the token expires
+
+                refresh_token - The refresh token
+
+                scope - The permission scope (as a space delimited string)
+        """
+        request = self.build_url_request()
+        f = urlopen(request)
+        token_data = loads(f.read())
+        return self._create_access_token(token_data)
+
+    def _create_access_token(self, token_data):
+        access_token = token_data.get('access_token')
+
+        if access_token is None:
+            raise AccessTokenResponseError('No access token returned in response')
+
+        token_type = token_data.get('token_type')
+        expires_in = token_data.get('expires_in')
+
+        if expires_in is not None:
+            expires_in = datetime.now() + timedelta(seconds=int(expires_in))
+
+        refresh_token = token_data.get('refresh_token')
+        scope = token_data.get('scope')
+
+        if scope is not None:
+            scope = scope.split(' ')
+
+        return AccessToken(access_token, token_type, expires_in, refresh_token, scope)
+
 
 class AccessToken(object):
     def __init__(self, access_token, token_type='bearer', expires=None,
