@@ -603,3 +603,16 @@ class TestOAuth2GrantTypes(unittest.TestCase):
     def test_new_client_credentials_with_scope(self):
         grant = grants.ClientCredentials(scope=('perm1', 'perm2'))
         self.assertEquals(grant._scope, ('perm1', 'perm2'))
+
+    def test_call_client_credentials(self):
+        grant = grants.ClientCredentials()
+        params = {}
+        grant(params)
+        self.assertEquals('client_credentials', params['grant_type'])
+
+    def test_call_client_credentials_with_scope(self):
+        grant = grants.ClientCredentials(scope=('perm1', 'perm2'))
+        params = {}
+        grant(params)
+        self.assertEquals('client_credentials', params['grant_type'])
+        self.assertEquals('perm1 perm2', params['scope'])

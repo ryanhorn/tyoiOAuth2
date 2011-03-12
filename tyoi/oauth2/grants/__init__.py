@@ -23,3 +23,8 @@ class ClientCredentials(object):
     """
     def __init__(self, scope=None):
         self._scope = scope
+
+    def __call__(self, parameters):
+        parameters['grant_type'] = 'client_credentials'
+        if self._scope is not None:
+            parameters['scope'] = ' '.join(self._scope)
