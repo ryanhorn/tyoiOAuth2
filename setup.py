@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="tyoi.OAuth2",
-    version="0.2.0",
+    version="0.2.1",
     author="Ryan Horn",
     author_email="ryan.horn.web@gmail.com",
     description=("Implements the client side of the OAuth 2 protocol"),

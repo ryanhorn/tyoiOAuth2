@@ -1,6 +1,7 @@
 """
 Contains grants representing possible OAuth2 grant types
 """
+from urllib import urlencode
 
 class AuthorizationCode(object):
     """
@@ -15,6 +16,20 @@ class AuthorizationCode(object):
         parameters['code'] = self._code
         parameters['redirect_uri'] = self._redirect_uri
         parameters['grant_type'] = 'authorization_code'
+
+    @staticmethod
+    def build_auth_uri(endpoint, client_id, redirect_uri=None, scope=None, state=None):
+        params = {'response_type': 'code', 'client_id': client_id}
+        if redirect_uri is not None:
+            params['redirect_uri'] = redirect_uri
+
+        if scope is not None:
+            params['scope'] = ' '.join(scope)
+
+        if state is not None:
+            params['state'] = state
+
+        return '%s?%s' % (endpoint, urlencode(params))
 
 class ClientCredentials(object):
     """
