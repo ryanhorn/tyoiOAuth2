@@ -15,3 +15,11 @@ class AuthorizationCode(object):
         parameters['code'] = self._code
         parameters['redirect_uri'] = self._redirect_uri
         parameters['grant_type'] = 'authorization_code'
+
+class ClientCredentials(object):
+    """
+    Callable which adds the appropriate parameters for requesting an access
+    token using the client_credentials grant type
+    """
+    def __init__(self, scope=None):
+        self._scope = scope

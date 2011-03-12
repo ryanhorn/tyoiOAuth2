@@ -582,16 +582,24 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertEquals('Bad request', error.error_description)
         self.assertEquals('http://www.example.com/errors/bad_request', error.error_uri)
 
-class TestOAuth2AuthorizationCodeGrant(unittest.TestCase):
-    def test_new(self):
+class TestOAuth2GrantTypes(unittest.TestCase):
+    def test_new_authorization_code(self):
         grant = grants.AuthorizationCode(code='test_code', redirect_uri='test_redirect_uri')
         self.assertEquals('test_code', grant._code)
         self.assertEquals('test_redirect_uri', grant._redirect_uri)
 
-    def test_call(self):
+    def test_call_authorization_code(self):
         grant = grants.AuthorizationCode(code='test_code', redirect_uri='test_redirect_uri')
         params = {}
         grant(params)
         self.assertEquals('test_code', params['code'])
         self.assertEquals('test_redirect_uri', params['redirect_uri'])
         self.assertEquals('authorization_code', params['grant_type'])
+
+    def test_new_client_credentials(self):
+        grant = grants.ClientCredentials()
+        self.assertEquals(grant._scope, None)
+
+    def test_new_client_credentials_with_scope(self):
+        grant = grants.ClientCredentials(scope=('perm1', 'perm2'))
+        self.assertEquals(grant._scope, ('perm1', 'perm2'))
