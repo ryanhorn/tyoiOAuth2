@@ -5,7 +5,7 @@ Implements the application side of OAuth2 for the "authoriztion_code" and
 
 from urllib import urlencode
 
-from urllib2 import urlopen, HTTPError
+from urllib2 import urlopen, HTTPError, Request
 
 from json import loads
 
@@ -89,6 +89,18 @@ class AccessTokenRequest(object):
         self._authenticator = authenticator
         self._grant = grant
         self._endpoint = endpoint
+
+    def build_url_request(self):
+        """
+        Consults the authenticator and grant for HTTP request parameters and
+        headers to send with the access token request, builds the request using
+        the stored endpoint and returns it.
+        """
+        params = {}
+        headers = {}
+        self._authenticator(params, headers)
+        self._grant(params)
+        return Request('%s?%s' % (self._endpoint, urlencode(params)), {}, headers)
 
 
 class AccessToken(object):

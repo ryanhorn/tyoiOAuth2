@@ -45,6 +45,32 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertRaises(oauth2.OAuth2Error, oauth2.AccessTokenRequest, 'not a callable', test_callable, 'test_endpoint')
         self.assertRaises(oauth2.OAuth2Error, oauth2.AccessTokenRequest, test_callable, 'not a callable', 'test_endpoint')
 
+    def test_build_url_request(self):
+        def authenticator(parameters, headers):
+            parameters['test_authenticator_param'] = 'test_authenticator_param_value'
+            headers['test_header'] = 'test_header_value'
+
+        def grant(parameters):
+            parameters['test_grant_param'] = 'test_grant_param_value'
+
+        req = oauth2.AccessTokenRequest(authenticator=authenticator,
+                                        grant=grant,
+                                        endpoint='http://www.example.com')
+
+        self._mox.StubOutClassWithMocks(oauth2, 'Request')
+
+        url_req = oauth2.Request('http://www.example.com?'
+                                 'test_grant_param=test_grant_param_value&'
+                                 'test_authenticator_param='
+                                 'test_authenticator_param_value',
+                                 {}, {'test_header': 'test_header_value'})
+
+        self._mox.ReplayAll()
+        result = req.build_url_request()
+        self._mox.VerifyAll()
+        self._mox.UnsetStubs()
+
+
     def test_new_o_auth2_client_bad_grant_type(self):
         self.assertRaises(oauth2.OAuth2Error, oauth2.OAuth2Client,
                           client_id='test', client_secret='test',
