@@ -3,7 +3,7 @@ import unittest
 import mox
 
 from tyoi import oauth2
-from tyoi.oauth2 import authenticators
+from tyoi.oauth2 import authenticators, grants
 
 
 class TestOAuth2Client(unittest.TestCase):
@@ -581,3 +581,9 @@ class TestOAuth2Client(unittest.TestCase):
         error = oauth2.AccessTokenRequestError(error_code='unknown', error_description='Bad request', error_uri='http://www.example.com/errors/bad_request')
         self.assertEquals('Bad request', error.error_description)
         self.assertEquals('http://www.example.com/errors/bad_request', error.error_uri)
+
+class TestOAuth2AuthorizationCodeGrant(unittest.TestCase):
+    def test_new(self):
+        grant = grants.AuthorizationCode(code='test_code', redirect_uri='test_redirect_uri')
+        self.assertEquals('test_code', grant._code)
+        self.assertEquals('test_redirect_uri', grant._redirect_uri)
