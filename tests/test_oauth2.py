@@ -235,6 +235,18 @@ class TestOAuth2GrantTypes(unittest.TestCase):
         self.assertEquals('test_redirect_uri', params['redirect_uri'])
         self.assertEquals('authorization_code', params['grant_type'])
 
+    def test_authorization_code_build_auth_uri_required_params(self):
+        uri = grants.AuthorizationCode.build_auth_uri('http://www.example.com', 'test_client_id')
+        self.assertEquals('http://www.example.com?response_type=code&client_id=test_client_id', uri)
+
+    def test_authorization_code_buid_auth_uri_optional_params(self):
+        uri = grants.AuthorizationCode.build_auth_uri(
+            'http://www.example.com', 'test_client_id',
+            'http://www.example.com/redirect', ['perm1', 'perm2', 'perm3'],
+            'test_state')
+
+        self.assertEquals('http://www.example.com?scope=perm1+perm2+perm3&state=test_state&redirect_uri=http%3A%2F%2Fwww.example.com%2Fredirect&response_type=code&client_id=test_client_id', uri)
+
     def test_new_client_credentials(self):
         grant = grants.ClientCredentials()
         self.assertEquals(grant._scope, None)
