@@ -78,14 +78,12 @@ class TestOAuth2Client(unittest.TestCase):
                                         endpoint='test_endpoint')
 
         self._mox.StubOutWithMock(req, 'build_url_request')
+        self._mox.StubOutWithMock(oauth2, 'urlopen')
 
-        urlopen_mock = self._create_urlopen_mock()
         resp_mock = self._create_file_mock()
-        tmp = oauth2.urlopen
-        oauth2.urlopen = urlopen_mock
 
         req.build_url_request().AndReturn('test return value')
-        urlopen_mock('test return value').AndReturn(resp_mock)
+        oauth2.urlopen('test return value').AndReturn(resp_mock)
         resp_mock.read().AndReturn('{"access_token": "test_access_token",\
                                      "token_type": "test_token_type",\
                                      "expires_in": "3600",\
@@ -109,7 +107,35 @@ class TestOAuth2Client(unittest.TestCase):
         self.assertTrue(0 == delta.days)
         self.assertTrue(60 > delta.seconds)
 
-        oauth2.urlopen = tmp
+        self._mox.UnsetStubs()
+
+    def test_send_custom_decoder(self):
+        def test_callable():
+            pass
+
+        def decode_form_encoded(query):
+            return dict([pair.split('=') for pair in query.split('&')])
+
+        req = oauth2.AccessTokenRequest(authenticator=test_callable,
+                                        grant=test_callable,
+                                        endpoint='test_endpoint')
+
+        self._mox.StubOutWithMock(req, 'build_url_request')
+        self._mox.StubOutWithMock(oauth2, 'urlopen')
+
+        resp_mock = self._create_file_mock()
+
+        req.build_url_request().AndReturn('test return value')
+        oauth2.urlopen('test return value').AndReturn(resp_mock)
+        resp_mock.read().AndReturn('access_token=test_access_token&token_type=test_token_type&refresh_token=test_refresh_token')
+
+        self._mox.ReplayAll()
+        token = req.send(response_decoder=decode_form_encoded)
+        self._mox.VerifyAll()
+
+        self.assertEquals('test_access_token', token.access_token)
+        self.assertEquals('test_token_type', token.token_type)
+        self.assertEquals('test_refresh_token', token.refresh_token)
 
         self._mox.UnsetStubs()
 

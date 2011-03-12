@@ -125,9 +125,13 @@ class AccessTokenRequest(object):
 
                 scope - The permission scope (as a space delimited string)
         """
+        decoder = loads
+        if response_decoder is not None and callable(response_decoder):
+            decoder = response_decoder
+
         request = self.build_url_request()
         f = urlopen(request)
-        token_data = loads(f.read())
+        token_data = decoder(f.read())
         return self._create_access_token(token_data)
 
     def _create_access_token(self, token_data):
