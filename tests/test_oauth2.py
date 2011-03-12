@@ -279,7 +279,7 @@ class TestOAuth2GrantTypes(unittest.TestCase):
 class TestOAuth2Authenticators(unittest.TestCase):
 
     def test_authenticator_client_credentials(self):
-        auth = authenticators.ClientCredentials(id='test_id', secret='test_secret')
+        auth = authenticators.ClientPassword(id='test_id', secret='test_secret')
         self.assertEquals('test_id', auth._id)
         self.assertEquals('test_secret', auth._secret)
         params = {}

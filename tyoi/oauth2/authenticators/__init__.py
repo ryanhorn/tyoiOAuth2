@@ -2,10 +2,10 @@
 Contains authenticators representing possible OAuth2 authentication methods
 """
 
-class ClientCredentials(object):
+class ClientPassword(object):
     """
     Callable which adds the appropriate parameters for requesting an access
-    token using the standard client credentials authentication method
+    token using the standard client password authentication method
     """
     def __init__(self, id, secret):
         self._id = id
