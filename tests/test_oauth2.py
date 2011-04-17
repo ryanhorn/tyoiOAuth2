@@ -164,6 +164,41 @@ class TestTokenRequest(unittest.TestCase):
             self._mox.UnsetStubs()
             del HTTPError.read
 
+    def test_send_error_response_non_string_error_code(self):
+        from urllib2 import HTTPError
+
+        def test_callable():
+            pass
+
+        req = oauth2.AccessTokenRequest(authenticator=test_callable,
+                                        grant=test_callable,
+                                        endpoint='test_endpoint')
+
+        self._mox.StubOutWithMock(req, 'build_url_request')
+        self._mox.StubOutWithMock(oauth2, 'urlopen')
+
+        # HTTPError.read cannot be directly mocked, so we need to stub it in
+        def read(self):
+            return '{"error": {"type": "OAuthException", "message": "Error validating verification code."}}'
+
+        HTTPError.read = read
+        http_error = HTTPError('test return value', 400, 'Bad Request', {}, None)
+
+        req.build_url_request().AndReturn('test return value')
+        oauth2.urlopen('test return value').AndRaise(http_error)
+
+        self._mox.ReplayAll()
+        try:
+            req.send()
+        except oauth2.AccessTokenRequestError as e:
+            self.assertEquals("{u'message': u'Error validating verification code.', u'type': u'OAuthException'}", e.error_code)
+        except Exception as ex:
+            self.fail('Expected exception oauth2.AccessTokenRequestError not raised. Got error %s' % ex)
+        finally:
+            self._mox.VerifyAll()
+            self._mox.UnsetStubs()
+            del HTTPError.read
+
 
 class TestAccessToken(unittest.TestCase):
 

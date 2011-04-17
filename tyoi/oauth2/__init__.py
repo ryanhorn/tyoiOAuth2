@@ -65,7 +65,7 @@ class AccessTokenRequestError(OAuth2Error):
 
                 invalid_scope
         """
-        self.error_code = error_code
+        self.error_code = error_code = str(error_code)
         self.error_code_description = AccessTokenRequestError.error_code_descriptions.get(error_code, 'Unknown error code')
         self.error_description = error_description
         self.error_uri = error_uri
